@@ -20,7 +20,7 @@ function [h_env_rt, H_env] = iron(h, theta, Q, a_id, b_id, F)
     % Step 0: Initialization
 
     if ~issorted(F)
-        error('F must be invertible');
+        error('F is not a well-defined cdf.');
     end
 
     len = b_id - a_id + 1;
@@ -86,14 +86,14 @@ function [h_env_rt, H_env] = iron(h, theta, Q, a_id, b_id, F)
     % Step 5: Interpolate the convex envelope over the original x grid
     H_env = interp1(xLower, yLower, Q_grid, 'linear', 'extrap');
 
-    h_env = diff(H_env)/stpsz;
-    h_env = [h_env h_env(end)];
+    h_env = diff(H_env)/stpsz;  
+    h_env = [h_env h_env(end)]; % ironed version
 
     
     h_env_hd = @(y) interp1(Q_grid, h_env, y, 'linear', 'extrap');
 
     h_env_comp = @(x) h_env_hd(F_hd(x)); % weighted by F
 
-    h_env_rt = h_env_comp(theta(a_id:b_id));
+    h_env_rt = h_env_comp(theta(a_id:b_id)); % return the ironed version of h
 
 end
